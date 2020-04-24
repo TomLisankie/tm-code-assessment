@@ -27,6 +27,7 @@
 
 ;; What feedback would you provide in a code review?
 ;; For the tests, put each row of the board on a separate line. This may be a personal preference thing, but since basically every dev reading it will know how Tic-Tac-Toe is played, it would be helpful to have a direct visual of what each board looks like.
+;; More descriptive binding names
 
 ;; (Bonus) How would you write it?
 ;; My code:
