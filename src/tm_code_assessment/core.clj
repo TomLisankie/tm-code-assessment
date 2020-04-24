@@ -23,7 +23,7 @@
 ;; It's supposed to be checking a tic-tac-toe board (vector of three vectors, each containing three keywords, `:x` or `:o`) to see which player won.
 
 ;; Describe at a high level how it works.
-;;
+;; The basic idea here is that each set passed into the check function is representing a way one could win at Tic-Tac-Toe. For example, `(map set board)` will return a list of sets each of which contain the elements in each row. The others represent columns, diagonal from top left, and diagonal from top right. If one of these ways of winning is a set of only one element, it means the player represented by that element has full coverage and has won the game.
 
 ;; What feedback would you provide in a code review?
 ;; For the tests, put each row of the board on a separate line. This may be a personal preference thing, but since basically every dev reading it will know how Tic-Tac-Toe is played, it would be helpful to have a direct visual of what each board looks like.
