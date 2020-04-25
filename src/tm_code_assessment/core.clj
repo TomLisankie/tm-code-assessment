@@ -3,24 +3,26 @@
 ;; 1) CODE REVIEW---------------------------------------------------------------
 
 ;; Given code:
+
 (let
     [check (fn [& sets]
-             (first (filter #(not (nil? %))
-                            (map
-                             (fn [ss]
-                               (let [r (first (filter #(or (= % #{:x}) (= % #{:o})) ss))]
-                                 (if r (first r) nil)))
-                             sets))))]
+             (first ;; take the first of the non-nil results of mapping
+              (filter #(not (nil? %)) ;; filter everything that's not nil
+                      (map ;; transform all of the sets so that
+                       (fn [ss]
+                         (let [r (first (filter #(or (= % #{:x}) (= % #{:o})) ss))] ;; filter out sets that contain a single element that's either `:x` or `:o`. Then, give me the first of those
+                           (if r (first r) nil))) ;; if there was at least one set that had only one `:x` or `:o` in it, give me whichever symbol it contained.
+                       sets))))]
   (defn ttt [board]
     (check
-     (map set board)
-     (map set (apply map list board))
-     (list (set (map #(nth (nth board %) %) (range 3))))
-     (list (set (map #(nth (nth board %) (- 2 %)) (range 3))))
-     )))
+     (map set board) ;; rows
+     (map set (apply map list board)) ;; columns
+     (list (set (map #(nth (nth board %) %) (range 3)))) ;; diagonal from top left
+     (list (set (map #(nth (nth board %) (- 2 %)) (range 3)))) ;; diagonal from top right
+   )))
 
 ;; What is the code trying to accomplish?
-;; It's supposed to be checking a tic-tac-toe board (vector of three vectors, each containing three keywords, `:x` or `:o`) to see which player won.
+;; It's trying to check a tic-tac-toe board (vector of three vectors, each containing three keywords, `:x` or `:o`) to see which player won.
 
 ;; Describe at a high level how it works.
 ;; The basic idea here is that each set passed into the check function is representing a way one could win at Tic-Tac-Toe. For example, `(map set board)` will return a list of sets each of which contain the elements in each row. The others represent columns, diagonal from top left, and diagonal from top right. If one of these ways of winning is a set of only one element, it means the player represented by that element has full coverage and has won the game.
@@ -33,23 +35,30 @@
 
 ;; (Bonus) How would you write it?
 ;; My code:
-(let ;; USE A PRE-CONDITION to check for proper size.
-    [check (fn [& sets]
-             (first ;; take the first of the non-nil results of mapping
-              (filter #(not (nil? %)) ;; filter everything that's not nil
-                            (map ;; transform all of the sets so that
-                             (fn [ss]
-                               (let [r (first (filter #(or (= % #{:x}) (= % #{:o})) ss))] ;; filter out sets that contain a single element that's either `:x` or `:o`. Then, give me the first of those
-                                 (if r (first r) nil))) ;; if there was at least one set that had only one `:x` or `:o` in it, give me whichever symbol it contained.
-                             sets))))]
-  (defn ttt [board]
-    {:pre [(= (count board) 3)
-           (= 3 (count (filter #(= 3 (count %)) board)))]}
-    (check
-     (map set board) ;; rows
-     (map set (apply map list board)) ;; columns
-     (list (set (map #(nth (nth board %) %) (range 3)))) ;; diagonal from top left
-     (list (set (map #(nth (nth board %) (- 2 %)) (range 3))))))) ;; diagonal from top right
+
+(defn tic-tac-toe-winner
+  [board]
+  "Evaluates which player (if any) won a game of Tic-Tac-Toe based on a final board"
+  {:pre [(seq? board)
+         (every? seq? board)
+         (= (count board) 3)
+         (every? #(= 3 (count %)) board)
+         (every? #{:o :x} (flatten board))]}
+  (let [check-board (fn [& board-patterns]
+                      (first
+                       (filter #(not (nil? %))
+                               (map
+                                (fn [patterns]
+                                  (let [pattern (first (filter #(or (= % #{:x}) (= % #{:o})) patterns))]
+                                    (if pattern
+                                      (first pattern)
+                                      nil)))
+                                board-patterns))))
+        rows (map set board)
+        columns (map set (apply map list board))
+        diagonal-top-left (list (set (map #(nth (nth board %) %) (range 3))))
+        diagonal-top-right (list (set (map #(nth (nth board %) (- 2 %)) (range 3))))]
+    (check-board rows columns diagonal-top-left diagonal-top-right)))
 
 
 ;; 2) CODE WRITING 1-------------------------------------------------------------
