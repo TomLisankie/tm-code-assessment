@@ -76,6 +76,62 @@
 
 ;; Write a function in any language that takes a sequence of numbers representing dots to connect and determines if it represents a valid pattern.
 
+(defn valid-passcode-pattern?
+  [pattern-seq]
+  (let [min-x 0 min-y 0
+        max-x 2 max-y 2
+        dot-grid [[1 2 3]
+                  [4 5 6]
+                  [7 8 9]]
+        dot->pos {1 [0 0] 2 [1 0] 3 [2 0]
+                  4 [0 1] 5 [1 1] 6 [2 1]
+                  7 [0 2] 8 [1 2] 9 [2 2]}
+        valid-pos? (fn [coords]
+                     (let [x (first coords)
+                           y (second coords)]
+                       (if (and (>= x min-x) (>= y min-y)
+                                (>= max-x x) (>= max-y y))
+                         true
+                         false)))
+        surrounding-dots (fn [dot-id]
+                           {:pre [(get dot->pos dot-id)]}
+                           (let [dot-coords (get dot->pos dot-id)
+                                 x (first dot-coords)
+                                 y (second (dot-coords))]
+                             #{[(- x 1) y]
+                               [(- x 1) (- y 1)]
+                               [x (- y 1)]
+                               [(+ x 1) (- y 1)]
+                               [(+ x 1) y]
+                               [(+ x 1) (+ y 1)]
+                               [x (+ y 1)]
+                               [(- x 1) (+ y 1)]
+                               [(- x 1) (+ y 2)]
+                               [(+ x 1) (+ y 2)]
+                               [(- x 1) (- y 2)]
+                               [(+ x 1) (- y 2)]
+                               }))]
+    (loop [used-dots #{}
+           current-dot (first pattern-seq)
+           remaining-dots (rest pattern-seq)]
+      (recur (conj used-dots current-dot)
+             (first remaining-dots)
+             (rest remaining-dots)
+             ))))
+
+
+
+
+
+(defn valid-passcode-pattern?
+  [pattern-seq]
+  (loop [used #{}
+         rest-of-pattern pattern-seq]
+    (if (empty? rest-of-pattern)
+      true
+      (if (contains? used (first rest-of-pattern))
+        false
+        (recur (conj used (first rest-of-pattern)) (rest rest-of-pattern))))))
 
 
 ;; Bonus
