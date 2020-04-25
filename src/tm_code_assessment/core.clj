@@ -43,6 +43,8 @@
                                  (if r (first r) nil))) ;; if there was at least one set that had only one `:x` or `:o` in it, give me whichever symbol it contained.
                              sets))))]
   (defn ttt [board]
+    {:pre [(= (count board) 3)
+           (= 3 (count (filter #(= 3 (count %)) board)))]}
     (check
      (map set board) ;; rows
      (map set (apply map list board)) ;; columns
