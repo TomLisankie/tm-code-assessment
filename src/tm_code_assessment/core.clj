@@ -54,13 +54,47 @@
 
 ;; 2) CODE WRITING 1-------------------------------------------------------------
 
+;; Android has a pattern lock screen with 9 dots:
+
+;; 1 2 3
+;; 4 5 6
+;; 7 8 9
+
+;; Dots may be connected in any order, but:
+;; Each dot may only be used once
+;; Dots must be connected with straight lines
+;; A dot may not be crossed without being used
+
+;; Write a function in any language that takes a sequence of numbers representing dots to connect and determines if it represents a valid pattern.
+
+
+
+;; Bonus
+;; - Given a PIN entered with a 9-digit keypad instead, how many digits would be required to have more possible combinations than the pattern lock?
+;; - If the grid can be extended to any square size (ex 4x4), but the pattern can only have up to 8 dots, what’s the smallest size at which there would be as many possibilities as an 8 character alphanumeric (a-z, A-Z, 0-9) password?
+
+
 
 
 
 ;; 3) CODE WRITING 2-------------------------------------------------------------
 
-
+;; Write a function in any language that takes a matrix of characters and a word, and returns the number of times that word appears in the matrix. The word may appear left-to-right, right-to-left, top-to-bottom, or bottom-to-top.
+;; Example:
+;; A O T D L R O W
+;; L C B M U M L U
+;; D R U J D B L J
+;; P A Z H Z Z E F
+;; B C Z E L F H W
+;; R K U L V P P G
+;; A L B L P O P Q
+;; B E M O P P J Y
 
 
 ;; 4) BONUS QUESTION-------------------------------------------------------------
+
+;; Develop a Clojure algorithm or theory on how to find the number of triangles that can be made inside of an equilateral triangle where a, b, and c are the number of internal lines coming from the corresponding point and no 3 of those lines cross at a single point
+;; https://bit.ly/2yHzeYp
+
+
 
