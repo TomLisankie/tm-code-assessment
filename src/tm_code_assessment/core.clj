@@ -26,12 +26,14 @@
 ;; The basic idea here is that each set passed into the check function is representing a way one could win at Tic-Tac-Toe. For example, `(map set board)` will return a list of sets each of which contain the elements in each row. The others represent columns, diagonal from top left, and diagonal from top right. If one of these ways of winning is a set of only one element, it means the player represented by that element has full coverage and has won the game.
 
 ;; What feedback would you provide in a code review?
-;; For the tests, put each row of the board on a separate line. This may be a personal preference thing, but since basically every dev reading it will know how Tic-Tac-Toe is played, it would be helpful to have a direct visual of what each board looks like.
-;; More descriptive binding names. More difficult to get an understanding of what the code is doing without descriptive names. Questions a reader of the code might ask: `check`? Check what? What's `ss`? What's that supposed to be? `r`? Oh, 'row' maybe?
+;; - For the tests, put each row of the board on a separate line. This may be a personal preference thing, but since basically every dev reading it will know how Tic-Tac-Toe is played, it would be helpful to have a direct visual of what each board being tested looks like.
+;; - More descriptive binding names. More difficult to get an understanding of what the code is doing without descriptive names. Questions a reader of the code might ask: `check`? Check what? What's `ss`? What's that supposed to be? `r`? Oh, 'row' maybe?
+;; - Don't use `defn` in a scope that isn't in the top-level. This is bad style, because you're affecting the top-level even though it happens in a level below the top. TODO: elaborate.
+;; - Make sure the board inputted is 3x3. Use a `:pre` condition for this as to not clutter the meat of the function.
 
 ;; (Bonus) How would you write it?
 ;; My code:
-(let
+(let ;; USE A PRE-CONDITION to check for proper size.
     [check (fn [& sets]
              (first ;; take the first of the non-nil results of mapping
               (filter #(not (nil? %)) ;; filter everything that's not nil
