@@ -200,18 +200,33 @@
              (rest rows)
              (conj positions (position-map-for-row y (first rows)))))))
 
-(position-map-for-grid word-search-puzzle-2)
+(group-by vals (position-map-for-grid word-search-puzzle-2))
 
+(defn positions-of-values
+  [])
 
 (defn occurrences-of-word-in-grid
   [grid word]
-  (let [pos->value-map (position-map-for-grid grid)
-        value->positions (reduce blah)
-        valid-pos? (fn)
-        reachable-positions (fn)
-        path-search (fn [position]
-                      )
-        ]
+  (let [char->all-pos {}
+        possible-matches (fn [pos word-length]
+                           (let [x (first pos)
+                                 y (second pos)
+                                 nums (range 1 word-length)
+                                 above (map #([x (+ y %)]) nums)
+                                 below (map #([x (- y %)]) nums)
+                                 left (map #([(- x %) y]) nums)
+                                 right (map #([(+ x %) y]) nums)])
+                           [above below left right])]
+    (map possible-matches (get char->all-pos (first word)))
+    (fn match? [word positions]
+      (loop [word-remainder (rest word)
+             remaining-positions positions]
+        (if (empty? word-remainder)
+          1
+          (if (contains? (get (first word-remainder) (first remaining-positions)))
+            (recur (rest word-remainder)
+                   (rest remaining-positions))
+            0))))
     (apply + (map path-search reachable-positions))))
 
 
