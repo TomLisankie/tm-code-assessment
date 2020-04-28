@@ -173,6 +173,11 @@
                          [\A \L \B \L \P \O \P \Q]
                          [\B \E \M \O \P \P \J \Y]])
 
+(def word-search-puzzle-2 [[\Z \Z \U \B]
+                           [\B \E \A \U]
+                           [\X \R \R \Z]
+                           [\B \U \Z \Z]])
+
 (defn position-map-for-row
   [y row]
   (loop [rest-of-row row
@@ -194,6 +199,9 @@
       (recur (inc y)
              (rest rows)
              (conj positions (position-map-for-row y (first rows)))))))
+
+(position-map-for-grid word-search-puzzle-2)
+
 
 (defn occurrences-of-word-in-grid
   [grid word]
