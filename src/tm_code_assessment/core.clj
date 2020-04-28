@@ -36,6 +36,10 @@
 ;; (Bonus) How would you write it?
 ;; My code:
 
+(defn matching-seq?
+  [grid seq-to-find seq-finding-rules-fn]
+  (seq-finding-rules-fn grid seq-to-find))
+
 (defn tic-tac-toe-winner
   [board]
   "Evaluates which player (if any) won a game of Tic-Tac-Toe based on a final board"
@@ -114,11 +118,16 @@
     (loop [used-dots #{}
            current-dot (first pattern-seq)
            remaining-dots (rest pattern-seq)]
-      (recur (conj used-dots current-dot)
-             (first remaining-dots)
-             (rest remaining-dots)
-             ))))
-
+      ;; this probably isn't correct, may want to reconsider
+      (if (nil? current-dot)
+        true
+        (if (contains? used-dots current-dot)
+          false
+          (if (empty? (filter (every-pred valid-pos? #(not (contains? used-dots %))) (surrounding-dots current-dot)))
+            false
+            (recur (conj used-dots current-dot)
+                   (first remaining-dots)
+                   (rest remaining-dots))))))))
 
 
 
@@ -154,6 +163,48 @@
 ;; R K U L V P P G
 ;; A L B L P O P Q
 ;; B E M O P P J Y
+
+(def word-search-puzzle [[\A \O \T \D \L \R \O \W]
+                         [\L \C \B \M \U \M \L \U]
+                         [\D \R \U \J \D \B \L \J]
+                         [\P \A \Z \H \Z \Z \E \F]
+                         [\B \C \Z \E \L \F \H \W]
+                         [\R \K \U \L \V \P \P \G]
+                         [\A \L \B \L \P \O \P \Q]
+                         [\B \E \M \O \P \P \J \Y]])
+
+(defn position-map-for-row
+  [y row]
+  (loop [rest-of-row row
+         x 0
+         positions {}]
+    (if (empty? rest-of-row)
+      positions
+      (recur (rest rest-of-row)
+             (inc x)
+             (conj positions [[x y] (first rest-of-row)])))))
+
+(defn position-map-for-grid
+  [grid]
+  (loop [y 0
+         rows grid
+         positions []]
+    (if (empty? rows)
+      positions
+      (recur (inc y)
+             (rest rows)
+             (conj positions (position-map-for-row y (first rows)))))))
+
+(defn occurrences-of-word-in-grid
+  [grid word]
+  (let [pos->value-map (position-map-for-grid grid)
+        value->positions (reduce blah)
+        valid-pos? (fn)
+        reachable-positions (fn)
+        path-search (fn [position]
+                      )
+        ]
+    (apply + (map path-search reachable-positions))))
 
 
 ;; 4) BONUS QUESTION-------------------------------------------------------------
