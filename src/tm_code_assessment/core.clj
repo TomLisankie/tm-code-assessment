@@ -164,74 +164,16 @@
 ;; A L B L P O P Q
 ;; B E M O P P J Y
 
-(def word-search-puzzle [[\A \O \T \D \L \R \O \W]
-                         [\L \C \B \M \U \M \L \U]
-                         [\D \R \U \J \D \B \L \J]
-                         [\P \A \Z \H \Z \Z \E \F]
-                         [\B \C \Z \E \L \F \H \W]
-                         [\R \K \U \L \V \P \P \G]
-                         [\A \L \B \L \P \O \P \Q]
-                         [\B \E \M \O \P \P \J \Y]])
-
-(def word-search-puzzle-2 [[\Z \Z \U \B]
-                           [\B \E \A \U]
-                           [\X \R \R \Z]
-                           [\B \U \Z \Z]])
-
-(defn position-map-for-row
-  [y row]
-  (loop [rest-of-row row
-         x 0
-         positions {}]
-    (if (empty? rest-of-row)
-      positions
-      (recur (rest rest-of-row)
-             (inc x)
-             (conj positions [[x y] (first rest-of-row)])))))
-
-(defn position-map-for-grid
-  [grid]
-  (loop [y 0
-         rows grid
-         positions []]
-    (if (empty? rows)
-      positions
-      (recur (inc y)
-             (rest rows)
-             (conj positions (position-map-for-row y (first rows)))))))
-
 (defn char-grid->all-pos-map
   [grid]
-  (let [row-pos-into-char-pos-map (fn [y row char->all-pos]
-                                    (loop [x 0
-                                           rest-of-row row
-                                           char->all-pos char->all-pos]
-                                      (if (empty? rest-of-row)
-                                        char->all-pos
-                                        (if (get char->all-pos (first rest-of-row))
-                                          (recur (inc x)
-                                                 (rest rest-of-row)
-                                                 (assoc char->all-pos
-                                                        (first rest-of-row)
-                                                        (conj
-                                                         (get char->all-pos
-                                                              (first rest-of-row))
-                                                         [x y])))
-                                          (recur (inc x)
-                                                 (rest rest-of-row)
-                                                 (assoc char->all-pos (first rest-of-row) #{[x y]}))))))
-        char->all-pos (loop [y 0
-                             rest-of-grid grid
-                             char->all-pos {}]
-                        (if (empty? rest-of-grid)
-                          char->all-pos
-                          (recur (inc y)
-                                 (rest rest-of-grid)
-                                 (row-pos-into-char-pos-map y (first rest-of-grid) char->all-pos))))
-        ]
-    char->all-pos))
-
-(char-grid->all-pos-map word-search-puzzle-2)
+  (let [char-pos-pairs (for [x (range (count (first grid)))
+                             y (range (count grid))]
+                         [(nth (nth grid y) x) [x y]])
+        all-letters (set (map first char-pos-pairs))
+        char->all-pos-pairs (map (fn [letter]
+                                   (vec [letter (set (map second (filter #(= (first %) letter) char-pos-pairs)))]))
+                                 all-letters)]
+    (into {} char->all-pos-pairs)))
 
 (defn occurrences-of-word-in-grid
   [grid word]
