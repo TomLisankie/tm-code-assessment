@@ -200,34 +200,72 @@
              (rest rows)
              (conj positions (position-map-for-row y (first rows)))))))
 
-(group-by vals (position-map-for-grid word-search-puzzle-2))
+(defn char-grid->all-pos-map
+  [grid]
+  (let [row-pos-into-char-pos-map (fn [y row char->all-pos]
+                                    (loop [x 0
+                                           rest-of-row row
+                                           char->all-pos char->all-pos]
+                                      (if (empty? rest-of-row)
+                                        char->all-pos
+                                        (if (get char->all-pos (first rest-of-row))
+                                          (recur (inc x)
+                                                 (rest rest-of-row)
+                                                 (assoc char->all-pos
+                                                        (first rest-of-row)
+                                                        (conj
+                                                         (get char->all-pos
+                                                              (first rest-of-row))
+                                                         [x y])))
+                                          (recur (inc x)
+                                                 (rest rest-of-row)
+                                                 (assoc char->all-pos (first rest-of-row) #{[x y]}))))))
+        char->all-pos (loop [y 0
+                             rest-of-grid grid
+                             char->all-pos {}]
+                        (if (empty? rest-of-grid)
+                          char->all-pos
+                          (recur (inc y)
+                                 (rest rest-of-grid)
+                                 (row-pos-into-char-pos-map y (first rest-of-grid) char->all-pos))))
+        ]
+    char->all-pos))
 
-(defn positions-of-values
-  [])
+(char-grid->all-pos-map word-search-puzzle-2)
 
 (defn occurrences-of-word-in-grid
   [grid word]
-  (let [char->all-pos {}
+  (let [char->all-pos (char-grid->all-pos-map grid)
         possible-matches (fn [pos word-length]
                            (let [x (first pos)
                                  y (second pos)
                                  nums (range 1 word-length)
-                                 above (map #([x (+ y %)]) nums)
-                                 below (map #([x (- y %)]) nums)
-                                 left (map #([(- x %) y]) nums)
-                                 right (map #([(+ x %) y]) nums)])
-                           [above below left right])]
-    (map possible-matches (get char->all-pos (first word)))
-    (fn match? [word positions]
-      (loop [word-remainder (rest word)
-             remaining-positions positions]
-        (if (empty? word-remainder)
-          1
-          (if (contains? (get (first word-remainder) (first remaining-positions)))
-            (recur (rest word-remainder)
-                   (rest remaining-positions))
-            0))))
-    (apply + (map path-search reachable-positions))))
+                                 above (map #(vec [x (+ y %)]) nums)
+                                 below (map #(vec [x (- y %)]) nums)
+                                 left (map #(vec [(- x %) y]) nums)
+                                 right (map #(vec [(+ x %) y]) nums)]
+                             [above below left right]))
+        match-patterns (map #(possible-matches % (count word)) (get char->all-pos (first word)))
+        match? (fn [word positions]
+                 (loop [word-remainder (rest word)
+                        remaining-positions positions]
+                   (if (empty? word-remainder)
+                     1
+                     (if (contains?
+                          (get char->all-pos (first word-remainder))
+                          (first remaining-positions))
+                       (recur (rest word-remainder)
+                              (rest remaining-positions))
+                       0))))
+        matches (loop [the-patterns match-patterns
+                       sums []]
+                  (if (empty? the-patterns)
+                    sums
+                    (recur (rest the-patterns)
+                           (concat sums (map #(match? word %) (first the-patterns))))))]
+    (apply + matches)))
+
+(occurrences-of-word-in-grid word-search-puzzle "HELLO")
 
 
 ;; 4) BONUS QUESTION-------------------------------------------------------------

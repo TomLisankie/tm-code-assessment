@@ -25,3 +25,19 @@
     (is (false? (valid-passcode-pattern? [1 9])))       ;; can't cross 5 without using
     (is (false? (valid-passcode-pattern? [1 2 3 2 1]))) ;; can't use dots more than once
     (is (false? (valid-passcode-pattern? [0 1 2 3]))))) ;; there's no dot 0
+
+(deftest occurrences-of-word-in-word-search-puzzle
+  (testing "function to count how many occurrences of a word are in a matrix consisting of alphabetic characters"
+    (let [test-puzzle [[\A \O \T \D \L \R \O \W]
+                       [\L \C \B \M \U \M \L \U]
+                       [\D \R \U \J \D \B \L \J]
+                       [\P \A \Z \H \Z \Z \E \F]
+                       [\B \C \Z \E \L \F \H \W]
+                       [\R \K \U \L \V \P \P \G]
+                       [\A \L \B \L \P \O \P \Q]
+                       [\B \E \M \O \P \P \J \Y]]]
+      (is (= 2 (occurrences-of-word-in-grid test-puzzle "HELLO")))
+      (is (= 1 (occurrences-of-word-in-grid test-puzzle "WORLD")))
+      (is (= 2 (occurrences-of-word-in-grid test-puzzle "BUZZ")))
+      (is (= 0 (occurrences-of-word-in-grid test-puzzle "CLOJURE")))
+      (is (= 0 (occurrences-of-word-in-grid test-puzzle "COWABUNGA"))))))
