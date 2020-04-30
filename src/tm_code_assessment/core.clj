@@ -89,52 +89,53 @@
 
 (defn valid-passcode-pattern?
   [pattern-seq]
-  (let [min-x 0 min-y 0
-        max-x 2 max-y 2
-        dot-grid [[1 2 3]
-                  [4 5 6]
-                  [7 8 9]]
-        dot->pos {1 [0 0] 2 [1 0] 3 [2 0]
-                  4 [0 1] 5 [1 1] 6 [2 1]
-                  7 [0 2] 8 [1 2] 9 [2 2]}
-        valid-pos? (fn [coords]
-                     (let [x (first coords)
-                           y (second coords)]
-                       (if (and (>= x min-x) (>= y min-y)
-                                (>= max-x x) (>= max-y y))
-                         true
-                         false)))
-        surrounding-dots (fn [dot-id]
-                           {:pre [(get dot->pos dot-id)]}
-                           (let [dot-coords (get dot->pos dot-id)
-                                 x (first dot-coords)
-                                 y (second (dot-coords))]
-                             #{[(- x 1) y]
-                               [(- x 1) (- y 1)]
-                               [x (- y 1)]
-                               [(+ x 1) (- y 1)]
-                               [(+ x 1) y]
-                               [(+ x 1) (+ y 1)]
-                               [x (+ y 1)]
-                               [(- x 1) (+ y 1)]
-                               [(- x 1) (+ y 2)]
-                               [(+ x 1) (+ y 2)]
-                               [(- x 1) (- y 2)]
-                               [(+ x 1) (- y 2)]
-                               }))]
-    (loop [used-dots #{}
-           current-dot (first pattern-seq)
-           remaining-dots (rest pattern-seq)]
-      ;; this probably isn't correct, may want to reconsider
-      (if (nil? current-dot)
+  {:pre [(sequential? pattern-seq)
+         (<= 2 (count pattern-seq))
+         (every? int? pattern-seq)]}
+  (let [dot-id->pos {1 [0 0] 2 [1 0] 3 [2 0]
+                     4 [0 1] 5 [1 1] 6 [2 1]
+                     7 [0 2] 8 [1 2] 9 [2 2]}
+        surrounding-positions (fn [dot-id used-dot-ids]
+                                (if (or (nil? (get dot-id->pos dot-id)) (contains? used-dot-ids dot-id)) ;; need to make sure the dot exists and hasn't already been seen
+                                  false
+                                  (let [dot-position (get dot-id->pos dot-id)
+                                        x (first dot-position)
+                                        y (second dot-position)
+                                        reachable-positions #{[(- x 1) y] ;; these positions include dots above, below, left, right, diagonal, and knight's jumps away for a given position
+                                                              [(- x 1) (- y 1)]
+                                                              [x (- y 1)]
+                                                              [(+ x 1) (- y 1)]
+                                                              [(+ x 1) y]
+                                                              [(+ x 1) (+ y 1)]
+                                                              [x (+ y 1)]
+                                                              [(- x 1) (+ y 1)]
+                                                              [(- x 1) (+ y 2)]
+                                                              [(+ x 1) (+ y 2)]
+                                                              [(- x 1) (- y 2)]
+                                                              [(+ x 1) (- y 2)]
+                                                              [(+ x 2) (- y 1)]
+                                                              [(- x 2) (- y 1)]
+                                                              [(+ x 2) (+ y 1)]
+                                                              [(- x 2) (+ y 1)]}]
+                                    reachable-positions)))]
+    (loop [rest-of-pattern-seq pattern-seq
+           current-dot-id (first rest-of-pattern-seq)
+           dot-to-connect-to (second rest-of-pattern-seq)
+           seen-dot-ids #{}
+           reachable-from-current-dot (surrounding-positions current-dot-id seen-dot-ids)]
+      (if (nil? dot-to-connect-to)
         true
-        (if (contains? used-dots current-dot)
+        (if (false? reachable-from-current-dot) ;; current-dot-id is not valid or it has been used already
           false
-          (if (empty? (filter (every-pred valid-pos? #(not (contains? used-dots %))) (surrounding-dots current-dot)))
-            false
-            (recur (conj used-dots current-dot)
-                   (first remaining-dots)
-                   (rest remaining-dots))))))))
+          (if (contains? reachable-from-current-dot (get dot-id->pos dot-to-connect-to)) ;; is the dot you're trying to connect to reachable from the current dot?
+            (recur (rest rest-of-pattern-seq)
+                   dot-to-connect-to
+                   (second (rest rest-of-pattern-seq))
+                   (conj seen-dot-ids current-dot-id)
+                   (surrounding-positions dot-to-connect-to (conj seen-dot-ids current-dot-id)))
+            false))))))
+
+(valid-passcode-pattern? [1 6 7 4])
 
 ;; Bonus
 ;; - Given a PIN entered with a 9-digit keypad instead, how many digits would be required to have more possible combinations than the pattern lock?
@@ -162,7 +163,7 @@
   {:pre [(sequential? grid)
          (every? sequential? grid)
          (every? #(= (count (first grid)) (count %)) grid)
-         (every? #(Character/isLetter %) (flatten grid))]}
+         (every? char? (flatten grid))]}
   (let [char-grid->all-pos-map
         (fn [grid]
           (let [char-pos-pairs (for [x (range (count (first grid)))
