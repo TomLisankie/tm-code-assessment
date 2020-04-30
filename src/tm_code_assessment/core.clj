@@ -177,6 +177,10 @@
 
 (defn occurrences-of-word-in-grid
   [grid word]
+  {:pre [(sequential? grid)
+         (every? sequential? grid)
+         (every? #(= (count (first grid)) (count %)) grid)
+         (every? #(Character/isLetter %) (flatten grid))]}
   (let [char->all-pos (char-grid->all-pos-map grid)
         possible-matches (fn [pos word-length]
                            (let [x (first pos)
@@ -206,9 +210,6 @@
                     (recur (rest the-patterns)
                            (concat sums (map #(match? word %) (first the-patterns))))))]
     (apply + matches)))
-
-(occurrences-of-word-in-grid word-search-puzzle "HELLO")
-
 
 ;; 4) BONUS QUESTION-------------------------------------------------------------
 
