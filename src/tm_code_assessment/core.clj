@@ -88,52 +88,6 @@
 
 ;; Write a function in any language that takes a sequence of numbers representing dots to connect and determines if it represents a valid pattern.
 
-(def dot-id->pos {1 [0 0] 2 [1 0] 3 [2 0] ;; hard-coding this because the grid size is constant
-                  4 [0 1] 5 [1 1] 6 [2 1]
-                  7 [0 2] 8 [1 2] 9 [2 2]})
-
-(def direct-neighbors-of-pos (fn [pos]
-                               (let [x (first pos)
-                                     y (second pos)]
-                                 #{[(+ x 1) y]
-                                   [(- x 1) y]
-                                   [x (+ y 1)]
-                                   [x (- y 1)]})))
-
-(def surrounding-positions (fn [dot-id used-dot-ids used-positions]
-                                (if (or (nil? (get dot-id->pos dot-id)) (contains? used-dot-ids dot-id)) ;; need to make sure the dot exists and hasn't already been seen
-                                  false
-                                  (let [dot-position (get dot-id->pos dot-id)
-                                        x (first dot-position)
-                                        y (second dot-position)
-                                        reachable-positions #{[(- x 1) y] ;; these positions include dots above, below, left, right, diagonal, and knight's jumps away for a given position
-                                                              [(- x 1) (- y 1)]
-                                                              [x (- y 1)]
-                                                              [(+ x 1) (- y 1)]
-                                                              [(+ x 1) y]
-                                                              [(+ x 1) (+ y 1)]
-                                                              [x (+ y 1)]
-                                                              [(- x 1) (+ y 1)]
-                                                              [(- x 1) (+ y 2)]
-                                                              [(+ x 1) (+ y 2)]
-                                                              [(- x 1) (- y 2)]
-                                                              [(+ x 1) (- y 2)]
-                                                              [(+ x 2) (- y 1)]
-                                                              [(- x 2) (- y 1)]
-                                                              [(+ x 2) (+ y 1)]
-                                                              [(- x 2) (+ y 1)]}]
-                                    (set/union reachable-positions (apply set/union (map
-                                                                                     #(when (contains? used-positions %)
-                                                                                        (direct-neighbors-of-pos %))
-                                                                                     reachable-positions)))))))
-
-(apply set/union (map
- #(when (contains? #{[1 0]} %)
-    (direct-neighbors-of-pos %))
- (surrounding-positions 1 #{2} #{[1 0]})))
-
-(contains? (surrounding-positions 1 #{2} #{[1 0]}) [2 0])
-
 (defn valid-passcode-pattern?
   [pattern-seq]
   {:pre [(sequential? pattern-seq)
