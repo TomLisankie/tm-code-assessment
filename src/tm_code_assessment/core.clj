@@ -129,20 +129,6 @@
                    (first remaining-dots)
                    (rest remaining-dots))))))))
 
-
-
-
-(defn valid-passcode-pattern?
-  [pattern-seq]
-  (loop [used #{}
-         rest-of-pattern pattern-seq]
-    (if (empty? rest-of-pattern)
-      true
-      (if (contains? used (first rest-of-pattern))
-        false
-        (recur (conj used (first rest-of-pattern)) (rest rest-of-pattern))))))
-
-
 ;; Bonus
 ;; - Given a PIN entered with a 9-digit keypad instead, how many digits would be required to have more possible combinations than the pattern lock?
 ;; - If the grid can be extended to any square size (ex 4x4), but the pattern can only have up to 8 dots, what’s the smallest size at which there would be as many possibilities as an 8 character alphanumeric (a-z, A-Z, 0-9) password?
@@ -164,24 +150,29 @@
 ;; A L B L P O P Q
 ;; B E M O P P J Y
 
-(defn char-grid->all-pos-map
-  [grid]
-  (let [char-pos-pairs (for [x (range (count (first grid)))
-                             y (range (count grid))]
-                         [(nth (nth grid y) x) [x y]])
-        all-letters (set (map first char-pos-pairs))
-        char->all-pos-pairs (map (fn [letter]
-                                   (vec [letter (set (map second (filter #(= (first %) letter) char-pos-pairs)))]))
-                                 all-letters)]
-    (into {} char->all-pos-pairs)))
-
 (defn occurrences-of-word-in-grid
   [grid word]
   {:pre [(sequential? grid)
          (every? sequential? grid)
          (every? #(= (count (first grid)) (count %)) grid)
          (every? #(Character/isLetter %) (flatten grid))]}
-  (let [char->all-pos (char-grid->all-pos-map grid)
+  (let [char-grid->all-pos-map
+        (fn [grid]
+          (let [char-pos-pairs (for [x (range (count (first grid)))
+                                     y (range (count grid))]
+                                 [(nth (nth grid y) x) [x y]])
+                all-letters (set (map first char-pos-pairs))
+                char->all-pos-pairs (map (fn [letter]
+                                           (vec [letter
+                                                 (set
+                                                  (map
+                                                   second
+                                                   (filter
+                                                    #(= (first %) letter)
+                                                    char-pos-pairs)))]))
+                                         all-letters)]
+            (into {} char->all-pos-pairs)))
+        char->all-pos (char-grid->all-pos-map grid)
         possible-matches (fn [pos word-length]
                            (let [x (first pos)
                                  y (second pos)
