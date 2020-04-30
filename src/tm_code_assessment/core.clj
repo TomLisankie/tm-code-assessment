@@ -29,7 +29,7 @@
 
 ;; What feedback would you provide in a code review?
 ;; - More descriptive binding names. Unnecessarily difficult to get an understanding of what the code is doing without descriptive names. Not clear from the start what `r` and `ss` are supposed to represent. Also, what's `check` supposed to be checking? Rename to `check-board` or something else that matches your intention.
-;; - Don't use `defn` in a scope that isn't in the top-level. This is bad style, because you're affecting the top-level even though it's happening within a local scope. Whether you 
+;; - Don't use `defn` in a scope that isn't in the top-level. This is bad style, because you're affecting the top-level even though it's happening within a local scope. Whether you TODO
 ;; - Make sure the board inputted is 3x3 and each row only contains `:x` and `:o` values. Use a `:pre` condition for this as to not clutter the meat of the function.
 ;; - Although the solution is clever, it's not obvious from the start what exactly you're trying to do. Please write some brief comments in the code to describe your approach at a high level
 ;; - For the tests, put each row of the board on a separate line. This may be a personal preference thing, but since basically every dev reading it will know how Tic-Tac-Toe is played, it would be helpful to have a direct visual of what each board being tested looks like.
