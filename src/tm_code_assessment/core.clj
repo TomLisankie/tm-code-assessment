@@ -93,9 +93,12 @@
   {:pre [(sequential? pattern-seq)
          (<= 2 (count pattern-seq))
          (every? int? pattern-seq)]}
-  (let [dot-id->pos {1 [0 0] 2 [1 0] 3 [2 0] ;; hard-coding this because the grid size is constant
-                     4 [0 1] 5 [1 1] 6 [2 1]
-                     7 [0 2] 8 [1 2] 9 [2 2]}
+  (let [dot-grid [[1 2 3]
+                  [4 5 6]
+                  [7 8 9]]
+        dot-id->pos (into {} (for [x (range (count (first dot-grid)))
+                                   y (range (count dot-grid))]
+                               [(nth (nth dot-grid y) x) [x y]]))
         direct-neighbors-of-pos (fn [pos]
                                   (let [x (first pos)
                                         y (second pos)]
@@ -148,8 +151,6 @@
                    (conj seen-positions (get dot-id->pos current-dot-id))
                    (surrounding-positions dot-to-connect-to (conj seen-dot-ids current-dot-id) (conj seen-positions (get dot-id->pos current-dot-id))))
             false))))))
-
-(valid-passcode-pattern? [2 1 3])
 
 ;; Bonus
 ;; - Given a PIN entered with a 9-digit keypad instead, how many digits would be required to have more possible combinations than the pattern lock?
