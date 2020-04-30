@@ -44,10 +44,6 @@
 ;; (Bonus) How would you write it?
 ;; My code:
 
-(defn matching-seq?
-  [grid seq-to-find seq-finding-rules-fn]
-  (seq-finding-rules-fn grid seq-to-find))
-
 (defn tic-tac-toe-winner
   [board]
   "Evaluates which player (if any) won a game of Tic-Tac-Toe based on a final board"
