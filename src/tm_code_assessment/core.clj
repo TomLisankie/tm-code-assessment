@@ -28,10 +28,17 @@
 ;; The basic idea here is that each set passed into the check function is representing a way one could win at Tic-Tac-Toe. For example, `(map set board)` will return a list of sets each of which contain the elements in each row. The others represent columns, diagonal from top left, and diagonal from top right. If one of these ways of winning is a set of only one element, it means the player represented by that element has full coverage and has won the game.
 
 ;; What feedback would you provide in a code review?
+;; - More descriptive binding names. Unnecessarily difficult to get an understanding of what the code is doing without descriptive names. Not clear from the start what `r` and `ss` are supposed to represent. Also, what's `check` supposed to be checking? Rename to `check-board` or something else that matches your intention.
+;; - Don't use `defn` in a scope that isn't in the top-level. This is bad style, because you're affecting the top-level even though it's happening within a local scope. Whether you 
+;; - Make sure the board inputted is 3x3 and each row only contains `:x` and `:o` values. Use a `:pre` condition for this as to not clutter the meat of the function.
+;; - Although the solution is clever, it's not obvious from the start what exactly you're trying to do. Please write some brief comments in the code to describe your approach at a high level
 ;; - For the tests, put each row of the board on a separate line. This may be a personal preference thing, but since basically every dev reading it will know how Tic-Tac-Toe is played, it would be helpful to have a direct visual of what each board being tested looks like.
-;; - More descriptive binding names. More difficult to get an understanding of what the code is doing without descriptive names. Questions a reader of the code might ask: `check`? Check what? What's `ss`? What's that supposed to be? `r`? Oh, 'row' maybe?
-;; - Don't use `defn` in a scope that isn't in the top-level. This is bad style, because you're affecting the top-level even though it happens in a level below the top. TODO: elaborate.
-;; - Make sure the board inputted is 3x3. Use a `:pre` condition for this as to not clutter the meat of the function.
+;; - Include tests that check for how the function responds to invalid inputs.
+;; - Include a doc-string for the `ttt` function so that future developers can just read that to understand what the function is supposed to do.
+;; - Consider renaming `ttt` to `tic-tac-toe-winner` or something similar. If the surrounding code is all Tic-Tac-Toe related, that may not be a problem. If it's not, a future dev may have to spend unnecessary time figuring out what the function is supposed to do, especially without a doc-string for the function.
+;; - Consider making `check` a top-level function. This completely depends on surrounding code though. If `check` is exclusively meant to be used for Tic-Tac-Toe, include it in a `let` expression in `ttt`.
+;; - Put trailing three parentheses on the previous line. Trailing delimiters should not have their own line in Clojure code
+
 
 ;; (Bonus) How would you write it?
 ;; My code:
