@@ -85,6 +85,7 @@
 ;; Write a function in any language that takes a sequence of numbers representing dots to connect and determines if it represents a valid pattern.
 
 (defn valid-passcode-pattern?
+  "Evaluates whether or not a given sequence of enumerated dots is a valid Android lock screen pattern"
   [pattern-seq]
   {:pre [(sequential? pattern-seq)
          (<= 2 (count pattern-seq))
@@ -170,6 +171,7 @@
 ;; B E M O P P J Y
 
 (defn occurrences-of-word-in-grid
+  "Finds how many occurrences of a given word are in a word-search puzzle."
   [grid word]
   {:pre [(sequential? grid)
          (every? sequential? grid)
