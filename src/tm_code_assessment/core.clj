@@ -64,8 +64,8 @@
                                 board-patterns))))
         rows (map set board)
         columns (map set (apply map list board))
-        diagonal-top-left (list (set (map #(nth (nth board %) %) (range 3))))
-        diagonal-top-right (list (set (map #(nth (nth board %) (- 2 %)) (range 3))))]
+        diagonal-top-left (->> (map #(nth (nth board %) %) (range 3)) set list)
+        diagonal-top-right (->> (map #(nth (nth board %) (- 2 %)) (range 3)) set list)]
     (check-board rows columns diagonal-top-left diagonal-top-right)))
 
 
@@ -97,6 +97,7 @@
                                    y (range (count dot-grid))]
                                [(nth (nth dot-grid y) x) [x y]]))
         direct-neighbors-of-pos (fn [pos]
+                                  "Used to find additional dots that are available when a neighboring dot to the current dot has already been used"
                                   (let [x (first pos)
                                         y (second pos)]
                                     #{[(+ x 1) y]
@@ -104,6 +105,7 @@
                                       [x (+ y 1)]
                                       [x (- y 1)]}))
         surrounding-positions (fn [dot-id used-dot-ids used-positions]
+                                "Finds all dots that can be reached from the current dot given which dots and positions have been used"
                                 (if (or (nil? (get dot-id->pos dot-id)) (contains? used-dot-ids dot-id)) ;; need to make sure the dot exists and hasn't already been seen
                                   false
                                   (let [dot-position (get dot-id->pos dot-id)
@@ -179,22 +181,22 @@
          (every? char? (flatten grid))]}
   (let [char-grid->all-pos-map
         (fn [grid]
+          "Generates a hashmap of every character that appears to a set of all the positions it appears at"
           (let [char-pos-pairs (for [x (range (count (first grid)))
                                      y (range (count grid))]
                                  [(nth (nth grid y) x) [x y]])
                 all-letters (set (map first char-pos-pairs))
                 char->all-pos-pairs (map (fn [letter]
-                                           (vec [letter
-                                                 (set
-                                                  (map
-                                                   second
-                                                   (filter
-                                                    #(= (first %) letter)
-                                                    char-pos-pairs)))]))
+                                           [letter (->> (filter
+                                                         #(= (first %) letter)
+                                                         char-pos-pairs)
+                                                        (map second)
+                                                        set)])
                                          all-letters)]
             (into {} char->all-pos-pairs)))
         char->all-pos (char-grid->all-pos-map grid)
         possible-matches (fn [pos word-length]
+                           "Finds all possible places the rest of the word could appear starting at `pos`"
                            (let [x (first pos)
                                  y (second pos)
                                  nums (range 1 word-length)
@@ -205,6 +207,7 @@
                              [above below left right]))
         match-patterns (map #(possible-matches % (count word)) (get char->all-pos (first word)))
         match? (fn [word positions]
+                 "Determines if one of the possible matches is an actual occurrence of the word. Evaluates to 1 if it's a match, 0 otherwise."
                  (loop [word-remainder (rest word)
                         remaining-positions positions]
                    (if (empty? word-remainder)
@@ -217,6 +220,7 @@
                        0))))
         matches (loop [the-patterns match-patterns
                        sums []]
+                  ;; Go through all possibilities and pick out occurrences of the given word
                   (if (empty? the-patterns)
                     sums
                     (recur (rest the-patterns)
