@@ -44,26 +44,20 @@
    9 #{2 4 5 6 8}
    })
 
+(defn inform-neighbors
+  [reachable-map num1 num2]
+  (assoc reachable-map
+         num1 (conj (get reachable-map num1) num2)
+         num2 (conj (get reachable-map num2) num1)))
+
 (defn- update-reachable
   [reachable-map selected-num]
   (cond
-    (= selected-num 2) (assoc reachable-map
-                              1 (conj (get reachable-map 1) 3)
-                              3 (conj (get reachable-map 3) 1))
-    (= selected-num 4) (assoc reachable-map
-                              1 (conj (get reachable-map 1) 7)
-                              7 (conj (get reachable-map 7) 1))
-    (= selected-num 6) (assoc reachable-map
-                              3 (conj (get reachable-map 3) 9)
-                              9 (conj (get reachable-map 9) 3))
-    (= selected-num 8) (assoc reachable-map
-                              7 (conj (get reachable-map 7) 9)
-                              9 (conj (get reachable-map 9) 7))
-    (= selected-num 5) (assoc reachable-map
-                              1 (conj (get reachable-map 1) 9)
-                              9 (conj (get reachable-map 9) 7)
-                              3 (conj (get reachable-map 3) 7)
-                              7 (conj (get reachable-map 7) 3))
+    (= selected-num 2) (inform-neighbors reachable-map 1 3)
+    (= selected-num 4) (inform-neighbors reachable-map 1 7)
+    (= selected-num 6) (inform-neighbors reachable-map 3 9)
+    (= selected-num 8) (inform-neighbors reachable-map 7 9)
+    (= selected-num 5) (inform-neighbors (inform-neighbors reachable-map 1 9) 3 7)
     :else reachable-map))
 
 (defn valid-path
@@ -87,8 +81,4 @@
           (recur reachable-map seen current accessible-from-current remaining-path next-num))
         false))))
 
-;; (defn count-words-in-matrix
-;;   [matrix string]
-;;   (let [[char->pos]
-;;         word-vec (vec string)
-;;         first-letter (first word-vec)]))
+
