@@ -44,21 +44,31 @@
    9 #{2 4 5 6 8}
    })
 
+(def nums-that-affect-reachability
+  {2 [[1 3]]
+   4 [[1 7]]
+   6 [[3 9]]
+   8 [[7 9]]
+   5 [[1 9] [3 7]]})
+
 (defn inform-neighbors
-  [reachable-map num1 num2]
-  (assoc reachable-map
-         num1 (conj (get reachable-map num1) num2)
-         num2 (conj (get reachable-map num2) num1)))
+  [reachable-map neighbor-pairs]
+  (let [pair (first neighbor-pairs)
+        num1 (first pair)
+        num2 (second pair)]
+    (if (empty? neighbor-pairs)
+      reachable-map
+      (inform-neighbors
+       (assoc reachable-map
+              num1 (conj (get reachable-map num1) num2)
+              num2 (conj (get reachable-map num2) num1))
+       (rest neighbor-pairs)))))
 
 (defn- update-reachable
   [reachable-map selected-num]
-  (cond
-    (= selected-num 2) (inform-neighbors reachable-map 1 3)
-    (= selected-num 4) (inform-neighbors reachable-map 1 7)
-    (= selected-num 6) (inform-neighbors reachable-map 3 9)
-    (= selected-num 8) (inform-neighbors reachable-map 7 9)
-    (= selected-num 5) (inform-neighbors (inform-neighbors reachable-map 1 9) 3 7)
-    :else reachable-map))
+  (if (some #(= selected-num %) (keys nums-that-affect-reachability))
+    (inform-neighbors reachable-map (get nums-that-affect-reachability selected-num))
+    reachable-map))
 
 (defn valid-path
   [path]
