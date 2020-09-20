@@ -10,3 +10,21 @@
     (is (false? (valid-path [1 9])))       ;; can't cross 5 without using
     (is (false? (valid-path [1 2 3 2 1]))) ;; can't use dots more than once
     (is (false? (valid-path [0 1 2 3]))))) ;; there's no dot 0
+
+;; (def test-puzzle
+;;   [[\A \O \T \D \L \R \O \W]
+;;    [\L \C \B \M \U \M \L \U]
+;;    [\D \R \U \J \D \B \L \J]
+;;    [\P \A \Z \H \Z \Z \E \F]
+;;    [\B \C \Z \E \L \F \H \W]
+;;    [\R \K \U \L \V \P \P \G]
+;;    [\A \L \B \L \P \O \P \Q]
+;;    [\B \E \M \O \P \P \J \Y]])
+
+;; (deftest occurrences-of-word-in-word-search-puzzle
+;;   (testing "function to count how many occurrences of a word are in a matrix consisting of alphabetic characters"
+;;     (is (= 2 (count-words-in-matrix test-puzzle "HELLO")))
+;;     (is (= 1 (count-words-in-matrix test-puzzle "WORLD")))
+;;     (is (= 2 (count-words-in-matrix test-puzzle "BUZZ")))
+;;     (is (= 0 (count-words-in-matrix test-puzzle "CLOJURE")))
+;;     (is (= 0 (count-words-in-matrix test-puzzle "COWABUNGA")))))

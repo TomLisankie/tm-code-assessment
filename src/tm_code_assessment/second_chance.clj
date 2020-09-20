@@ -31,45 +31,64 @@
 
 ;; PROBLEM 2
 
-(def position-type
+(def reachable-from
   {
-   1 :corner
-   2 :middle-top-bottom
-   3 :corner
-   4 :middle-left-right
-   5 :middle
-   6 :middle-left-right
-   7 :corner
-   8 :middle-top-bottom
-   9 :corner
+   1 #{2 4 5 6 8}
+   2 #{1 3 4 5 6 7 9}
+   3 #{2 4 5 6 8}
+   4 #{1 2 3 5 7 8 9}
+   5 #{1 2 3 4 6 7 8 9}
+   6 #{1 2 3 5 7 8 9}
+   7 #{2 4 5 6 8}
+   8 #{1 3 4 5 6 7 9}
+   9 #{2 4 5 6 8}
    })
-(def accessible-from
-  {
-   :corner #{2 4 5 6 8}
-   :middle-top-bottom #{1 3 4 5 6 7 9}
-   :middle-left-right #{1 2 3 5 7 8 9}
-   :middle #{1 2 3 4 6 7 8 9}
-   })
+
+(defn- update-reachable
+  [reachable-map selected-num]
+  (cond
+    (= selected-num 2) (assoc reachable-map
+                              1 (conj (get reachable-map 1) 3)
+                              3 (conj (get reachable-map 3) 1))
+    (= selected-num 4) (assoc reachable-map
+                              1 (conj (get reachable-map 1) 7)
+                              7 (conj (get reachable-map 7) 1))
+    (= selected-num 6) (assoc reachable-map
+                              3 (conj (get reachable-map 3) 9)
+                              9 (conj (get reachable-map 9) 3))
+    (= selected-num 8) (assoc reachable-map
+                              7 (conj (get reachable-map 7) 9)
+                              9 (conj (get reachable-map 9) 7))
+    (= selected-num 5) (assoc reachable-map
+                              1 (conj (get reachable-map 1) 9)
+                              9 (conj (get reachable-map 9) 7)
+                              3 (conj (get reachable-map 3) 7)
+                              7 (conj (get reachable-map 7) 3))
+    :else reachable-map))
 
 (defn valid-path
   [path]
-  (loop [seen #{(first path)}
+  (loop [reachable-map reachable-from
+         seen #{(first path)}
          current (first path)
-         current-type (get position-type current)
-         accessible-from-current (get accessible-from current-type)
+         accessible-from-current (get reachable-map current)
          remaining-path (rest path)
          next-num (first remaining-path)]
     (if (nil? next-num)
       true
       (if (and (contains? accessible-from-current next-num)
                (not (contains? seen next-num)))
-        (let [seen (conj seen next-num)
+        (let [reachable-map (update-reachable reachable-map current)
+              seen (conj seen next-num)
               current next-num
-              current-type (get position-type current)
-              accessible-from-current (get accessible-from current-type)
+              accessible-from-current (get reachable-map current)
               remaining-path (rest remaining-path)
               next-num (first remaining-path)]
-          (recur seen current current-type accessible-from-current remaining-path next-num))
+          (recur reachable-map seen current accessible-from-current remaining-path next-num))
         false))))
 
-
+;; (defn count-words-in-matrix
+;;   [matrix string]
+;;   (let [[char->pos]
+;;         word-vec (vec string)
+;;         first-letter (first word-vec)]))
