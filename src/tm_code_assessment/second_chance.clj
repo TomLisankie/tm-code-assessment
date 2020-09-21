@@ -127,10 +127,10 @@
   (loop [char-vec (rest char-vec)
          next-pos (get-new-position starting-position direction)
          next-char (get positions->letters next-pos)]
-    (if (not= (first char-vec) next-char)
-      0
-      (if (empty? char-vec)
-        1
+    (if (empty? char-vec)
+      1
+      (if (not= (first char-vec) next-char)
+        0
         (recur
          (rest char-vec)
          (get-new-position next-pos direction)
