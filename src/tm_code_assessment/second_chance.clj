@@ -2,32 +2,33 @@
 
 ;; PROBLEM 1
 
+(defn- has-win-situation?
+  [win-type]
+  (let [matches (first (filter #(or (= % #{:x}) (= % #{:o})) win-type))]
+    (if matches
+      (first matches)
+      nil)))
+
 (defn- check-for-win
   [& win-types]
-  (let [has-win-situation? (fn [win-type]
-                             (let [matches (first (filter #(or (= % #{:x}) (= % #{:o})) win-type))]
-                               (if matches
-                                 (first matches)
-                                 nil)))
-        win-situations-with-ties (map has-win-situation? win-types)
+  (let [win-situations-with-ties (map has-win-situation? win-types)
         win-situations-no-ties (filter #(not (nil? %)) win-situations-with-ties)]
     (first win-situations-no-ties)))
 
 (defn get-tic-tac-toe-winner
   [board]
-  (let [rows (map set board)
+  (let [board-size 3
+        rows (map set board)
         columns (map set (apply map list board))
-        diagonal-top-left (list (set (map #(nth (nth board %) %) (range 3))))
-        diagonal-top-right (list (set (map #(nth (nth board %) (- 2 %)) (range 3))))]
+        diagonal-top-left (list (set (map #(nth (nth board %) %)
+                                          (range board-size))))
+        diagonal-top-right (list (set (map #(nth (nth board %) (- 2 %))
+                                           (range board-size))))]
     (check-for-win
      rows
      columns
      diagonal-top-left
      diagonal-top-right)))
-
-(assert (= :x (get-tic-tac-toe-winner [[:x :o :x] [:x :o :o] [:x :x :o]])))
-(assert (= :o (get-tic-tac-toe-winner [[:o :x :x] [:x :o :x] [:x :o :o]])))
-(assert (nil? (get-tic-tac-toe-winner [[:x :o :x] [:x :o :x] [:o :x :o]])))
 
 ;; PROBLEM 2
 
@@ -95,21 +96,6 @@
 
 ;; PROBLEM 3
 
-;; (defn count-words-in-matrix
-;;   [matrix string]
-;;   (let [char-vec (vec string)
-;;         letters->positions (get-letter-positions matrix)
-;;         positions->letters (get-letters-at-each-position matrix)
-;;         first-letter (first char-vec)]
-;;     (loop [first-letter-positions (get letters->positions first-letter)
-;;            appearances 0]
-;;         (if (or (not (some #(= % first-letter) (keys letters->positions)))
-;;                 (empty? first-letter-positions))
-;;           appearances
-;;           (recur
-;;            (rest first-letter-positions)
-;;            (+ appearances (occurrence? char-vec (first first-letter-positions))))))))
-
 (defn- get-direction-for-positions
   [start-pos end-pos]
   (let [[x-start y-start] start-pos
@@ -160,27 +146,31 @@
         neighbors (get-neighbors starting-position positions->letters)
         next-char (first char-vec)
         matches (filter #(= (second %) next-char) neighbors)
-        directions-to-search (map #(get-direction-for-positions starting-position (first %)) matches)
-        search-results (map #(search-in-direction %1 char-vec (first %2) positions->letters) directions-to-search matches)]
+        directions-to-search (map
+                              #(get-direction-for-positions starting-position (first %))
+                              matches)
+        search-results (map
+                        #(search-in-direction %1 char-vec (first %2) positions->letters)
+                        directions-to-search matches)]
     (if (empty? matches)
       0
       (apply + search-results))))
 
-(defn- get-letters-at-each-position
+(defn- get-position-to-letters-map
   [matrix]
   (let [pos-letter-pairs (for [y (range (count matrix))]
                            (for [x (range (count (first matrix)))]
                              [[(inc x) (inc y)] (nth (nth matrix y) x)]))]
     (into (hash-map) (reduce into [] pos-letter-pairs))))
 
-(defn- get-positions-of-letter
+(defn- get-positions-for-letter
   [letter positions->letters]
   (map first (filter #(= (second %) letter) positions->letters)))
 
 (defn count-words-in-matrix
   [matrix string]
   (let [char-vec (vec string)
-        positions->letters (get-letters-at-each-position matrix)
-        starting-positions (get-positions-of-letter (first char-vec) positions->letters)
+        positions->letters (get-position-to-letters-map matrix)
+        starting-positions (get-positions-for-letter (first char-vec) positions->letters)
         occurrences (map #(find-word-occurrence % char-vec positions->letters) starting-positions)]
     (reduce + occurrences)))

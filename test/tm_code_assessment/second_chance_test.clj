@@ -2,6 +2,12 @@
   (:require  [clojure.test :refer :all]
              [tm-code-assessment.second-chance :refer :all]))
 
+(deftest tic-tac-toe-test
+  (testing "function that finds who won a game of tic-tac-toe"
+    (is (= :x (get-tic-tac-toe-winner [[:x :o :x] [:x :o :o] [:x :x :o]])))
+    (is (= :o (get-tic-tac-toe-winner [[:o :x :x] [:x :o :x] [:x :o :o]])))
+    (is (nil? (get-tic-tac-toe-winner [[:x :o :x] [:x :o :x] [:o :x :o]])))))
+
 (deftest valid-lock-screen-pattern
   (testing "function to detect valid lock screen patterns works properly"
     (is (true?  (valid-path [1 6 7 4])))   ;; knights jump is valid
